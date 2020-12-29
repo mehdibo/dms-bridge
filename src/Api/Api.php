@@ -40,6 +40,13 @@ class Api
 
     public function newAccount(Account $account): void
     {
+        $this->sendRequest(
+            'POST',
+            '/api/account/add',
+            [
+                'local_identifier' => $account->getIdentifier(),
+            ]
+        );
     }
 
 }
