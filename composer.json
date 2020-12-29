@@ -16,6 +16,7 @@
     },
     "require": {
         "php": "^7.4",
-        "league/oauth2-client": "^2.6"
+        "league/oauth2-client": "^2.6",
+        "symfony/http-client": "^5.2"
     }
 }
