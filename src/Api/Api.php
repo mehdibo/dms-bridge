@@ -4,7 +4,7 @@
 namespace Mehdibo\DmsBridge\Api;
 
 
-use League\OAuth2\Client\Provider\GenericProvider;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use Mehdibo\DmsBridge\Entities\Account;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -14,18 +14,18 @@ class Api
 
     private const API_ENDPOINT = 'https://eni3qpl7a3fc.x.pipedream.net';
 
-    private GenericProvider $genericProvider;
+    private AbstractProvider $oauth;
     private HttpClientInterface $client;
 
-    public function __construct(GenericProvider $genericProvider, HttpClientInterface $client)
+    public function __construct(AbstractProvider $oauthProvider, HttpClientInterface $client)
     {
-        $this->genericProvider = $genericProvider;
+        $this->oauth = $oauthProvider;
         $this->client = $client;
     }
 
     private function sendRequest(string $method, string $endpoint, array $payload): ResponseInterface
     {
-        $token = $this->genericProvider->getAccessToken('client_credentials');
+        $token = $this->oauth->getAccessToken('client_credentials');
         return $this->client->request(
             $method,
             self::API_ENDPOINT.$endpoint,
