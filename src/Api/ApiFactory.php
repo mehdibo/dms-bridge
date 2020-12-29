@@ -5,6 +5,7 @@ namespace Mehdibo\DmsBridge\Api;
 
 
 use League\OAuth2\Client\Provider\GenericProvider;
+use Symfony\Component\HttpClient\HttpClient;
 
 class ApiFactory
 {
@@ -25,6 +26,6 @@ class ApiFactory
             'urlAccessToken'          => $urlAccessToken,
             'urlResourceOwnerDetails' => $urlResourceOwnerDetails,
         ]);
-        return new Api($provider);
+        return new Api($provider, HttpClient::create());
     }
 }
