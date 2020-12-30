@@ -70,6 +70,17 @@ class Api
         return $transactions;
     }
 
+    private function getAccountBalance(string $identifier): float
+    {
+        $response = $this->sendRequest(
+            'GET',
+            '/api/account/'.$identifier.'/balance'
+        );
+        if ($response->getStatusCode() !== 200)
+            return 0.0;
+        return $response->toArray()['asset'];
+    }
+
     public function getAccount(string $identifier): ?Account
     {
         $response = $this->sendRequest(
@@ -82,8 +93,8 @@ class Api
         $account = new Account();
         $account->setIdentifier($data['local_identifier'])
             ->setTimestamp(new \DateTime($data['timestamp']))
-            ->setTransactions($data['transactions']);
-        // TODO: get balance
+            ->setTransactions($data['transactions'])
+            ->setBalance($this->getAccountBalance($identifier));
         return $account;
     }
 }
