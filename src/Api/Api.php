@@ -27,6 +27,7 @@ class Api
 
     private function sendRequest(string $method, string $endpoint, array $payload = []): ResponseInterface
     {
+        // TODO: uncomment oauth
 //        $token = $this->oauth->getAccessToken('client_credentials');
         $response = $this->client->request(
             $method,
