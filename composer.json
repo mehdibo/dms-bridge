@@ -12,7 +12,7 @@
     "autoload": {
         "psr-4": {
             "Mehdibo\\DmsBridge\\" : "src/",
-            "Mehdibo\\DmsBridge\\\\Tests\\" : "tests/"
+            "Mehdibo\\DmsBridge\\Tests\\" : "tests/"
         }
     },
     "require": {
