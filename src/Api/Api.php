@@ -54,7 +54,7 @@ class Api
     }
 
     /**
-     * @param array[][] $transactions
+     * @param array $rawTransactions
      * @return Transaction[]
      */
     private function transactionsFactory(array $rawTransactions): array
