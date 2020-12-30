@@ -1,6 +1,6 @@
 <?php
 
-namespace Entities;
+namespace Mehdibo\DmsBridge\Tests\Entities;
 
 use Mehdibo\DmsBridge\Entities\Transaction;
 use PHPUnit\Framework\TestCase;
