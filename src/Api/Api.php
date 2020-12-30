@@ -6,13 +6,14 @@ namespace Mehdibo\DmsBridge\Api;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use Mehdibo\DmsBridge\Entities\Account;
+use Mehdibo\DmsBridge\Entities\Transaction;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class Api
 {
 
-    private const API_ENDPOINT = 'https://eni3qpl7a3fc.x.pipedream.net';
+    private const API_ENDPOINT = 'http://10.25.1.231:8000';
 
     private AbstractProvider $oauth;
     private HttpClientInterface $client;
@@ -23,19 +24,22 @@ class Api
         $this->client = $client;
     }
 
-    private function sendRequest(string $method, string $endpoint, array $payload): ResponseInterface
+    private function sendRequest(string $method, string $endpoint, array $payload = []): ResponseInterface
     {
-        $token = $this->oauth->getAccessToken('client_credentials');
-        return $this->client->request(
+//        $token = $this->oauth->getAccessToken('client_credentials');
+        $response = $this->client->request(
             $method,
             self::API_ENDPOINT.$endpoint,
             [
                 'headers' => [
-                    'Authorization' => 'Bearer '.$token->getToken()
+//                    'Authorization' => 'Bearer '.$token->getToken()
                 ],
                 'json' => $payload
             ]
         );
+        var_dump($response->getStatusCode());
+        var_dump($response->getContent());
+        return $response;
     }
 
     public function newAccount(Account $account): void
@@ -49,4 +53,37 @@ class Api
         );
     }
 
+    /**
+     * @param array[][] $transactions
+     * @return Transaction[]
+     */
+    private function transactionsFactory(array $rawTransactions): array
+    {
+        $transactions = [];
+        foreach ($rawTransactions as $rawTransaction) {
+            $transactions[] = (new Transaction())->setAsset($rawTransaction['asset'])
+                ->setUuid($rawTransaction['transaction_uuid'])
+                ->setSrc($rawTransaction['source'])
+                ->setDst($rawTransaction['destination'])
+                ->setValid($rawTransaction['valid']);
+        }
+        return $transactions;
+    }
+
+    public function getAccount(string $identifier): ?Account
+    {
+        $response = $this->sendRequest(
+            'GET',
+            '/api/account/'.$identifier.'/find'
+        );
+        if ($response->getStatusCode() !== 200)
+            return null;
+        $data = $response->toArray();
+        $account = new Account();
+        $account->setIdentifier($data['local_identifier'])
+            ->setTimestamp(new \DateTime($data['timestamp']))
+            ->setTransactions($data['transactions']);
+        // TODO: get balance
+        return $account;
+    }
 }
