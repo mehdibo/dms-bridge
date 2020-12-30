@@ -15,6 +15,8 @@ class Account
      */
     private array $transactions = [];
 
+    private \DateTimeInterface $timestamp;
+
     /**
      * @return string
      */
@@ -68,5 +70,25 @@ class Account
         $this->transactions = $transactions;
         return $this;
     }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getTimestamp(): \DateTimeInterface
+    {
+        return $this->timestamp;
+    }
+
+    /**
+     * @param \DateTimeInterface $timestamp
+     * @return Account
+     */
+    public function setTimestamp(\DateTimeInterface $timestamp): Account
+    {
+        $this->timestamp = $timestamp;
+        return $this;
+    }
+
+
 
 }
