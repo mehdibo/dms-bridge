@@ -24,6 +24,11 @@ class ApiTest extends TestCase
         $this->oauthProvider = $stub;
     }
 
+    private function createApi(HttpClientInterface $client): Api
+    {
+        return new Api('http://localhost', $this->oauthProvider, $client);
+    }
+
     /**
      * @param array $respBody
      * @param int $respStatusCode
@@ -58,8 +63,16 @@ class ApiTest extends TestCase
         $data = [
             'local_identifier' => 'account_id',
             'timestamp' => '2020-12-30T16:11:26.175Z',
-
+            'transactions' => [],
+            'asset' => 133.7,
         ];
-        $client = $this->createClient($data, 200);
+        $client = $this->createClient($data);
+        $api = $this->createApi($client);
+        $account = $api->getAccount('test_identifier');
+        $this->assertInstanceOf(Account::class, $account);
+        $this->assertEquals($data['local_identifier'], $account->getIdentifier());
+        $this->assertEquals(new \DateTime($data['timestamp']), $account->getTimestamp());
+        $this->assertCount(count($data['transactions']), $account->getTransactions());
+        $this->assertEquals($data['asset'], $account->getBalance());
     }
 }
