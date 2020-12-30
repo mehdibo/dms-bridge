@@ -93,7 +93,7 @@ class Api
         $account = new Account();
         $account->setIdentifier($data['local_identifier'])
             ->setTimestamp(new \DateTime($data['timestamp']))
-            ->setTransactions($data['transactions'])
+            ->setTransactions($this->transactionsFactory($data['transactions']))
             ->setBalance($this->getAccountBalance($identifier));
         return $account;
     }
