@@ -13,13 +13,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class Api
 {
 
-    private const API_ENDPOINT = 'http://10.25.1.231:8000';
+    private string $apiBase;
 
     private AbstractProvider $oauth;
     private HttpClientInterface $client;
 
-    public function __construct(AbstractProvider $oauthProvider, HttpClientInterface $client)
+    public function __construct(string $apiBase, AbstractProvider $oauthProvider, HttpClientInterface $client)
     {
+        $this->apiBase = rtrim($apiBase, '/');
         $this->oauth = $oauthProvider;
         $this->client = $client;
     }
@@ -29,7 +30,7 @@ class Api
 //        $token = $this->oauth->getAccessToken('client_credentials');
         $response = $this->client->request(
             $method,
-            self::API_ENDPOINT.$endpoint,
+            $this->apiBase.$endpoint,
             [
                 'headers' => [
 //                    'Authorization' => 'Bearer '.$token->getToken()
