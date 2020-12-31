@@ -109,4 +109,11 @@ class ApiTest extends TestCase
         }
         $this->assertEquals($data['asset'], $account->getBalance());
     }
+
+    public function testDeposit(): void
+    {
+        $client = $this->createClient([]);
+        $api = $this->createApi($client);
+        $api->deposit('account_id', 15.90);
+    }
 }
