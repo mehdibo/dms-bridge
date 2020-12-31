@@ -17,23 +17,36 @@ class Api
 
     private AbstractProvider $oauth;
     private HttpClientInterface $client;
+    private bool $test;
 
-    public function __construct(string $apiBase, AbstractProvider $oauthProvider, HttpClientInterface $client)
+    /**
+     * Api constructor.
+     * @param string $apiBase
+     * @param AbstractProvider $oauthProvider
+     * @param HttpClientInterface $client
+     * @param bool $testing TRUE if it's a testing env, skips the oauth part
+     */
+    public function __construct(string $apiBase, AbstractProvider $oauthProvider, HttpClientInterface $client, bool $testing = false)
     {
         $this->apiBase = rtrim($apiBase, '/');
         $this->oauth = $oauthProvider;
         $this->client = $client;
+        $this->test = $testing;
     }
 
     private function sendRequest(string $method, string $endpoint, array $payload = []): ResponseInterface
     {
-        $token = $this->oauth->getAccessToken('client_credentials');
+        $token = 'dummy_token';
+        if (!$this->test) {
+            $token = $this->oauth->getAccessToken('client_credentials')->getToken();
+
+        }
         return $this->client->request(
             $method,
             $this->apiBase.$endpoint,
             [
                 'headers' => [
-                    'Authorization' => 'Bearer '.$token->getToken()
+                    'Authorization' => 'Bearer '.$token
                 ],
                 'json' => $payload
             ]
