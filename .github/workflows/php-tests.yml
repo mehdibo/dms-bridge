@@ -1,0 +1,22 @@
+name: PHP Tests
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Validate composer.json
+        run: composer validate
+
+      - name: Install dependencies
+        run: composer install --no-progress --no-suggest --no-interaction
+
+      - name: Run test suite
+        run: vendor/bin/phpunit --testdox
