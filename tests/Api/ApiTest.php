@@ -5,6 +5,7 @@ namespace Mehdibo\DmsBridge\Tests\Api;
 
 
 use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 use Mehdibo\DmsBridge\Api\Api;
 use Mehdibo\DmsBridge\Entities\Account;
 use Mehdibo\DmsBridge\Entities\Transaction;
@@ -19,10 +20,13 @@ class ApiTest extends TestCase
 
     public function setUp(): void
     {
-        $stub = $this->createStub(AbstractProvider::class);
-        $stub->method('getAccessToken')
+        $tokenStub = $this->createStub(AccessTokenInterface::class);
+        $tokenStub->method('getToken')
             ->willReturn('access_token');
-        $this->oauthProvider = $stub;
+        $providerStub = $this->createStub(AbstractProvider::class);
+        $providerStub->method('getAccessToken')
+            ->willReturn($tokenStub);
+        $this->oauthProvider = $providerStub;
     }
 
     private function createApi(HttpClientInterface $client): Api
