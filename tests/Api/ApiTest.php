@@ -48,16 +48,19 @@ class ApiTest extends TestCase
             ->willReturn($responseStub);
         return $clientStub;
     }
-//  TODO:
-//    public function testNewAccount(): void
-//    {
-//        $api = new Api(
-//            'http://localhost',
-//            $this->oauthProvider,
-//            $this->createClient([])
-//        );
-//        $api->newAccount((new Account())->setIdentifier('account_identifier'));
-//    }
+
+    /**
+     * This test doesnt have any assertion as the function doesnt return any value
+     */
+    public function testNewAccount(): void
+    {
+        $api = new Api(
+            'http://localhost',
+            $this->oauthProvider,
+            $this->createClient([])
+        );
+        $api->newAccount((new Account())->setIdentifier('account_identifier'));
+    }
 
     public function testGetAccount(): void
     {
