@@ -111,4 +111,16 @@ class Api
             ]
         );
     }
+
+    public function withdraw(string $identifier, float $amount): void
+    {
+        $this->sendRequest(
+            'POST',
+            '/api/network/withdraw',
+            [
+                'identifier' => $identifier,
+                'asset' => $amount
+            ]
+        );
+    }
 }
