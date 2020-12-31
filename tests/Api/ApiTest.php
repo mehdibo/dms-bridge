@@ -116,4 +116,11 @@ class ApiTest extends TestCase
         $api = $this->createApi($client);
         $api->deposit('account_id', 15.90);
     }
+
+    public function testWithdraw(): void
+    {
+        $client = $this->createClient([]);
+        $api = $this->createApi($client);
+        $api->withdraw('account_id', 15.90);
+    }
 }
