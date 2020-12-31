@@ -27,21 +27,17 @@ class Api
 
     private function sendRequest(string $method, string $endpoint, array $payload = []): ResponseInterface
     {
-        // TODO: uncomment oauth
-//        $token = $this->oauth->getAccessToken('client_credentials');
-        $response = $this->client->request(
+        $token = $this->oauth->getAccessToken('client_credentials');
+        return $this->client->request(
             $method,
             $this->apiBase.$endpoint,
             [
                 'headers' => [
-//                    'Authorization' => 'Bearer '.$token->getToken()
+                    'Authorization' => 'Bearer '.$token->getToken()
                 ],
                 'json' => $payload
             ]
         );
-        var_dump($response->getStatusCode());
-        var_dump($response->getContent());
-        return $response;
     }
 
     public function newAccount(Account $account): void
