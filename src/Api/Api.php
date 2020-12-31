@@ -40,6 +40,10 @@ class Api
         );
     }
 
+    /**
+     * TODO: should the function only accept an identifier?
+     * @param Account $account
+     */
     public function newAccount(Account $account): void
     {
         $this->sendRequest(
@@ -94,5 +98,17 @@ class Api
             ->setTransactions($this->transactionsFactory($data['transactions']))
             ->setBalance($this->getAccountBalance($identifier));
         return $account;
+    }
+
+    public function deposit(string $identifier, float $amount): void
+    {
+        $this->sendRequest(
+            'POST',
+            '/api/network/deposit',
+            [
+                'identifier' => $identifier,
+                'asset' => $amount
+            ]
+        );
     }
 }
