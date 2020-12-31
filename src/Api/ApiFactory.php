@@ -13,20 +13,18 @@ class ApiFactory
         string $apiBase,
         string $clientId,
         string $clientSecret,
-        string $redirectUri,
-        string $urlAuthorize,
-        string $urlAccessToken,
-        string $urlResourceOwnerDetails
+        bool $testing = false
     ): Api
     {
+        $apiBase = rtrim($apiBase, "/");
         $provider = new GenericProvider([
             'clientId'                => $clientId,
             'clientSecret'            => $clientSecret,
-            'redirectUri'             => $redirectUri,
-            'urlAuthorize'            => $urlAuthorize,
-            'urlAccessToken'          => $urlAccessToken,
-            'urlResourceOwnerDetails' => $urlResourceOwnerDetails,
+            'redirectUri'             => '',
+            'urlAuthorize'            => '', // Doesnt apply as we will be using client_credentials grant
+            'urlAccessToken'          => $apiBase.'/api/users/login',
+            'urlResourceOwnerDetails' => $apiBase.'/api/users/me',
         ]);
-        return new Api($apiBase, $provider, HttpClient::create());
+        return new Api($apiBase, $provider, HttpClient::create(), $testing);
     }
 }
