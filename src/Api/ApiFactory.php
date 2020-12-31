@@ -10,6 +10,7 @@ use Symfony\Component\HttpClient\HttpClient;
 class ApiFactory
 {
     public static function create(
+        string $apiBase,
         string $clientId,
         string $clientSecret,
         string $redirectUri,
@@ -26,6 +27,6 @@ class ApiFactory
             'urlAccessToken'          => $urlAccessToken,
             'urlResourceOwnerDetails' => $urlResourceOwnerDetails,
         ]);
-        return new Api($provider, HttpClient::create());
+        return new Api($apiBase, $provider, HttpClient::create());
     }
 }
