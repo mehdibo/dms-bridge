@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: composer install --no-progress --no-interaction
 
-      - name: Check for dependencies
+      - name: Check for outdated dependencies
         run: composer outdated -D
 
       - name: Run test suite
