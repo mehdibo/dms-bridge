@@ -37,10 +37,8 @@ class Api
     private function sendRequest(string $method, string $endpoint, array $payload = []): ResponseInterface
     {
         $token = 'dummy_token';
-        if (!$this->test) {
+        if (!$this->test)
             $token = $this->oauth->getAccessToken('client_credentials')->getToken();
-
-        }
         return $this->client->request(
             $method,
             $this->apiBase.$endpoint,
