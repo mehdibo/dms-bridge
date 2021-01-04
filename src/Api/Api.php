@@ -54,18 +54,21 @@ class Api
     }
 
     /**
-     * TODO: should the function only accept an identifier?
-     * @param Account $account
+     * @param string $accountId
+     * @return Account
      */
-    public function newAccount(Account $account): void
+    public function newAccount(string $accountId): ?Account
     {
-        $this->sendRequest(
+        $resp = $this->sendRequest(
             'POST',
             '/api/account/add',
             [
-                'local_identifier' => $account->getIdentifier(),
+                'local_identifier' => $accountId,
             ]
         );
+        if ($resp->getStatusCode() === 200)
+            return (new Account())->setIdentifier($accountId);
+        return null;
     }
 
     /**

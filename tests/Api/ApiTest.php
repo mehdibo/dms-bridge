@@ -63,7 +63,9 @@ class ApiTest extends TestCase
             $this->oauthProvider,
             $this->createClient([])
         );
-        $api->newAccount((new Account())->setIdentifier('account_identifier'));
+        $result = $api->newAccount('account_identifier');
+        $this->assertInstanceOf(Account::class, $result);
+        $this->assertEquals('account_identifier', $result->getIdentifier());
     }
 
     public function testGetAccount(): void
