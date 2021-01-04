@@ -125,4 +125,16 @@ class ApiTest extends TestCase
         $api = $this->createApi($client);
         $api->withdraw('account_id', 15.90);
     }
+    public function testNewTransaction(): void
+    {
+        $client = $this->createClient([]);
+        $api = $this->createApi($client);
+        $transaction = new Transaction();
+        $transaction->setValid(true)
+            ->setDst('dst_id')
+            ->setSrc('src_id')
+            ->setUuid('uuid_1')
+            ->setAsset(95.23);
+        $api->newTransaction($transaction);
+    }
 }
