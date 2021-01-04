@@ -1,6 +1,6 @@
 {
-    "name": "mehdibo/dms-bridge",
-    "description": "A library to use the DMS API",
+    "name": "mehdibo/dps-bridge",
+    "description": "A library to use the Distributed Payment System API",
     "type": "library",
     "license": "MIT",
     "authors": [
