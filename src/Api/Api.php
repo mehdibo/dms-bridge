@@ -137,4 +137,19 @@ class Api
             ]
         );
     }
+
+    public function newTransaction(Transaction $transaction): void
+    {
+        $this->sendRequest(
+            'POST',
+            '/api/transaction/new',
+            [
+                'asset' => $transaction->getAsset(),
+                'transaction_uuid' => $transaction->getUuid(),
+                'source' => $transaction->getSrc(),
+                'destination' => $transaction->getDst(),
+                'valid' => $transaction->isValid(),
+            ]
+        );
+    }
 }
