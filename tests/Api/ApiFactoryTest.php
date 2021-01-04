@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Mehdibo\DmsBridge\Tests\Api;
+namespace Mehdibo\DpsBridge\Tests\Api;
 
 
-use Mehdibo\DmsBridge\Api\Api;
-use Mehdibo\DmsBridge\Api\ApiFactory;
+use Mehdibo\DpsBridge\Api\Api;
+use Mehdibo\DpsBridge\Api\ApiFactory;
 use PHPUnit\Framework\TestCase;
 
 class ApiFactoryTest extends TestCase

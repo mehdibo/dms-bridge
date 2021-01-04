@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Mehdibo\DmsBridge\Api;
+namespace Mehdibo\DpsBridge\Api;
 
 
 use League\OAuth2\Client\Provider\GenericProvider;

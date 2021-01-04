@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Mehdibo\DmsBridge\Entities;
+namespace Mehdibo\DpsBridge\Entities;
 
 
 class Transaction

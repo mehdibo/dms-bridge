@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Mehdibo\DmsBridge\Api;
+namespace Mehdibo\DpsBridge\Api;
 
 
 use League\OAuth2\Client\Provider\AbstractProvider;
-use Mehdibo\DmsBridge\Entities\Account;
-use Mehdibo\DmsBridge\Entities\Transaction;
+use Mehdibo\DpsBridge\Entities\Account;
+use Mehdibo\DpsBridge\Entities\Transaction;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 

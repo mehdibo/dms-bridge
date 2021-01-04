@@ -1,9 +1,9 @@
 <?php
 
-namespace Mehdibo\DmsBridge\Tests\Entities;
+namespace Mehdibo\DpsBridge\Tests\Entities;
 
-use Mehdibo\DmsBridge\Entities\Account;
-use Mehdibo\DmsBridge\Entities\Transaction;
+use Mehdibo\DpsBridge\Entities\Account;
+use Mehdibo\DpsBridge\Entities\Transaction;
 use PHPUnit\Framework\TestCase;
 
 class AccountTest extends TestCase

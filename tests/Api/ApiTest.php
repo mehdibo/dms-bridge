@@ -1,14 +1,14 @@
 <?php
 
 
-namespace Mehdibo\DmsBridge\Tests\Api;
+namespace Mehdibo\DpsBridge\Tests\Api;
 
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use Mehdibo\DmsBridge\Api\Api;
-use Mehdibo\DmsBridge\Entities\Account;
-use Mehdibo\DmsBridge\Entities\Transaction;
+use Mehdibo\DpsBridge\Api\Api;
+use Mehdibo\DpsBridge\Entities\Account;
+use Mehdibo\DpsBridge\Entities\Transaction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
