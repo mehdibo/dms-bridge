@@ -17,10 +17,7 @@ class ApiFactoryTest extends TestCase
             'https://www.example.com',
             'client_id',
             'client_secret',
-            'redirect_uri',
-            'https://www.example.com',
-            'https://www.example.com',
-            'https://www.example.com',
+            true,
         );
         $this->assertInstanceOf(Api::class, $api);
     }
