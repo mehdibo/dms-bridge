@@ -56,7 +56,7 @@ class ApiTest extends TestCase
     /**
      * This test doesnt have any assertion as the function doesnt return any value
      */
-    public function testNewAccount(): void
+    public function testCreateAccount(): void
     {
         $api = new Api(
             'http://localhost',
