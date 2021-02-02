@@ -4,6 +4,6 @@
 namespace Mehdibo\DpsBridge\Exception;
 
 
-class AuthenticationFailed extends \Exception
+class AuthenticationException extends \Exception
 {
 }
