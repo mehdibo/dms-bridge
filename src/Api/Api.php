@@ -40,7 +40,6 @@ class Api
 
     /**
      * @return ResponseInterface
-     * @throws AuthenticationException
      * @throws ApiRequestException
      */
     private function sendRequest(string $method, string $endpoint, array $payload = []): ResponseInterface
@@ -51,11 +50,12 @@ class Api
             try {
                 $token = $this->oauth->getAccessToken('client_credentials')->getToken();
             } catch (IdentityProviderException $e) {
-                throw new AuthenticationException($e->getMessage(), 0, $e);
+                $authException = new AuthenticationException($e->getMessage(), 0, $e);
+                throw new ApiRequestException($e->getMessage(), 0, $authException);;
             }
         }
         try {
-            return $this->client->request(
+            $resp = $this->client->request(
                 $method,
                 $this->apiBase . $endpoint,
                 [
@@ -65,6 +65,11 @@ class Api
                     'json' => $payload
                 ]
             );
+            $statusCode = $resp->getStatusCode();
+            if ($statusCode !== 200) {
+                throw new ApiRequestException("Request failed ($statusCode): " . $resp->getContent(false));
+            }
+            return $resp;
         } catch (TransportExceptionInterface $e) {
             throw new ApiRequestException($e->getMessage(), 0, $e);
         }
@@ -77,29 +82,13 @@ class Api
      */
     public function createAccount(string $accountId): void
     {
-        try {
-            $resp = $this->sendRequest(
-                'POST',
-                '/api/account/add',
-                [
-                    'local_identifier' => $accountId,
-                ]
-            );
-        } catch (AuthenticationException $e) {
-            throw new ApiRequestException($e->getMessage(), 0, $e);
-        }
-
-        try {
-            $statusCode = $resp->getStatusCode();
-        } catch (TransportExceptionInterface $e) {
-            throw new ApiRequestException($e->getMessage(), 0, $e);
-        }
-
-        if ($statusCode === 200) {
-            return;
-        }
-
-        throw new ApiRequestException(sprintf("Request failed ($statusCode): %s", $resp->getContent(false)));
+        $this->sendRequest(
+            'POST',
+            '/api/account/add',
+            [
+                'local_identifier' => $accountId,
+            ]
+        );
     }
 
     /**
