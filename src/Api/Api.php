@@ -71,10 +71,11 @@ class Api
     }
 
     /**
+     * Add new account to DPS
      * @param string $accountId
      * @throws ApiRequestException
      */
-    public function newAccount(string $accountId): void
+    public function createAccount(string $accountId): void
     {
         try {
             $resp = $this->sendRequest(
