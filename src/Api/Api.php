@@ -39,9 +39,6 @@ class Api
     }
 
     /**
-     * @param string $method
-     * @param string $endpoint
-     * @param array $payload
      * @return ResponseInterface
      * @throws AuthenticationException
      * @throws ApiRequestException
@@ -75,20 +72,33 @@ class Api
 
     /**
      * @param string $accountId
-     * @return Account
+     * @throws ApiRequestException
      */
-    public function newAccount(string $accountId): ?Account
+    public function newAccount(string $accountId): void
     {
-        $resp = $this->sendRequest(
-            'POST',
-            '/api/account/add',
-            [
-                'local_identifier' => $accountId,
-            ]
-        );
-        if ($resp->getStatusCode() === 200)
-            return (new Account())->setIdentifier($accountId);
-        return null;
+        try {
+            $resp = $this->sendRequest(
+                'POST',
+                '/api/account/add',
+                [
+                    'local_identifier' => $accountId,
+                ]
+            );
+        } catch (AuthenticationException $e) {
+            throw new ApiRequestException($e->getMessage(), 0, $e);
+        }
+
+        try {
+            $statusCode = $resp->getStatusCode();
+        } catch (TransportExceptionInterface $e) {
+            throw new ApiRequestException($e->getMessage(), 0, $e);
+        }
+
+        if ($statusCode === 200) {
+            return;
+        }
+
+        throw new ApiRequestException(sprintf("Request failed ($statusCode): %s", $resp->getContent(false)));
     }
 
     /**
