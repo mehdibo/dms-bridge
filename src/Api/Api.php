@@ -10,6 +10,7 @@ use Mehdibo\DpsBridge\Entities\Account;
 use Mehdibo\DpsBridge\Entities\Transaction;
 use Mehdibo\DpsBridge\Exception\ApiRequestException;
 use Mehdibo\DpsBridge\Exception\AuthenticationException;
+use Mehdibo\DpsBridge\Exception\BadResponseException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -108,15 +109,23 @@ class Api
         return $transactions;
     }
 
+    /**
+     * @param string $identifier
+     * @return float
+     * @throws ApiRequestException
+     * @throws BadResponseException
+     */
     private function getAccountBalance(string $identifier): float
     {
         $response = $this->sendRequest(
             'GET',
             '/api/account/'.$identifier.'/balance'
         );
-        if ($response->getStatusCode() !== 200)
-            return 0.0;
-        return $response->toArray()['asset'];
+        $data = $response->toArray(false);
+        if (!isset($data['asset'])) {
+            throw new BadResponseException("Couldn't find asset in response body");
+        }
+        return (float) $data['asset'];
     }
 
     public function getAccount(string $identifier): ?Account
