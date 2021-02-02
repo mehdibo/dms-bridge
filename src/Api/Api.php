@@ -5,8 +5,12 @@ namespace Mehdibo\DpsBridge\Api;
 
 
 use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mehdibo\DpsBridge\Entities\Account;
 use Mehdibo\DpsBridge\Entities\Transaction;
+use Mehdibo\DpsBridge\Exception\ApiRequestException;
+use Mehdibo\DpsBridge\Exception\AuthenticationException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -34,21 +38,39 @@ class Api
         $this->test = $testing;
     }
 
+    /**
+     * @param string $method
+     * @param string $endpoint
+     * @param array $payload
+     * @return ResponseInterface
+     * @throws AuthenticationException
+     * @throws ApiRequestException
+     */
     private function sendRequest(string $method, string $endpoint, array $payload = []): ResponseInterface
     {
+        // OAuth is not activated in the testing environment
         $token = 'dummy_token';
-        if (!$this->test)
-            $token = $this->oauth->getAccessToken('client_credentials')->getToken();
-        return $this->client->request(
-            $method,
-            $this->apiBase.$endpoint,
-            [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$token
-                ],
-                'json' => $payload
-            ]
-        );
+        if (!$this->test) {
+            try {
+                $token = $this->oauth->getAccessToken('client_credentials')->getToken();
+            } catch (IdentityProviderException $e) {
+                throw new AuthenticationException($e->getMessage(), 0, $e);
+            }
+        }
+        try {
+            return $this->client->request(
+                $method,
+                $this->apiBase . $endpoint,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token
+                    ],
+                    'json' => $payload
+                ]
+            );
+        } catch (TransportExceptionInterface $e) {
+            throw new ApiRequestException($e->getMessage(), 0, $e);
+        }
     }
 
     /**
