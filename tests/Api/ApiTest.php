@@ -7,7 +7,7 @@ namespace Mehdibo\DpsBridge\Tests\Api;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use Mehdibo\DpsBridge\Api\Api;
-use Mehdibo\DpsBridge\Entities\Account;
+use Mehdibo\DpsBridge\Entities\AccountInterface;
 use Mehdibo\DpsBridge\Entities\Transaction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -92,7 +92,7 @@ class ApiTest extends TestCase
         $client = $this->createClient($data);
         $api = $this->createApi($client);
         $account = $api->getAccount('test_identifier');
-        $this->assertInstanceOf(Account::class, $account);
+        $this->assertInstanceOf(AccountInterface::class, $account);
         $this->assertEquals($data['local_identifier'], $account->getId());
         $this->assertEquals(new \DateTime($data['timestamp']), $account->getTimestamp());
         $this->assertCount(count($data['transactions']), $account->getTransactions());

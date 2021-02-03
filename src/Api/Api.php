@@ -7,6 +7,7 @@ namespace Mehdibo\DpsBridge\Api;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mehdibo\DpsBridge\Entities\Account;
+use Mehdibo\DpsBridge\Entities\AccountInterface;
 use Mehdibo\DpsBridge\Entities\Transaction;
 use Mehdibo\DpsBridge\Exception\ApiRequestException;
 use Mehdibo\DpsBridge\Exception\AuthenticationException;
@@ -132,7 +133,7 @@ class Api
      * @return Account|null
      * @throws ApiRequestException
      */
-    public function getAccount(string $identifier): ?Account
+    public function getAccount(string $identifier): ?AccountInterface
     {
         $resp = $this->sendRequest(
             'GET',
