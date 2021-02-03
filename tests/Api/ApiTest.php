@@ -36,21 +36,33 @@ class ApiTest extends TestCase
 
     /**
      * @param array $respBody
+     * @param array $expectedRequest ["METHOD", "URL", ["OPTIONS"]]
      * @param int $respStatusCode
      * @return HttpClientInterface
      */
-    private function createClient(array $respBody, int $respStatusCode = 200): HttpClientInterface
+    private function createClient(array $respBody, array $expectedRequest, int $respStatusCode = 200): HttpClientInterface
     {
-        $responseStub = $this->createStub(ResponseInterface::class);
+        $responseStub = $this->createMock(ResponseInterface::class);
         $responseStub->method('toArray')
             ->willReturn($respBody);
         $responseStub->method('getStatusCode')
             ->willReturn($respStatusCode);
 
-        $clientStub = $this->createStub(HttpClientInterface::class);
+        $clientStub = $this->createMock(HttpClientInterface::class);
         $clientStub->method('request')
+            ->withConsecutive($expectedRequest)
             ->willReturn($responseStub);
         return $clientStub;
+    }
+
+    private function getExpectedOptions(array $payload): array
+    {
+        return [
+            'headers' => [
+                'Authorization' => 'Bearer access_token'
+            ],
+            'json' => $payload
+        ];
     }
 
     /**
@@ -58,16 +70,26 @@ class ApiTest extends TestCase
      */
     public function testCreateAccount(): void
     {
+        $expectedRequest = [
+            "POST",
+            "http://localhost/api/account/add",
+            $this->getExpectedOptions(["local_identifier" => "account_identifier"])
+        ];
         $api = new Api(
             'http://localhost',
             $this->oauthProvider,
-            $this->createClient([])
+            $this->createClient([], $expectedRequest)
         );
         $api->createAccount('account_identifier');
     }
 
     public function testGetAccount(): void
     {
+        $expectedRequest = [
+            "GET",
+            "http://localhost/api/account/test_identifier/find",
+            $this->getExpectedOptions([])
+        ];
         $data = [
             'local_identifier' => 'account_id',
             'timestamp' => '2020-12-30T16:11:26.175Z',
@@ -89,7 +111,7 @@ class ApiTest extends TestCase
             ],
             'asset' => 133.7,
         ];
-        $client = $this->createClient($data);
+        $client = $this->createClient($data, $expectedRequest);
         $api = $this->createApi($client);
         $account = $api->getAccount('test_identifier');
         $this->assertInstanceOf(AccountInterface::class, $account);
@@ -112,20 +134,41 @@ class ApiTest extends TestCase
 
     public function testDeposit(): void
     {
-        $client = $this->createClient([]);
+        $expectedRequest = [
+            "POST",
+            "http://localhost/api/network/deposit",
+            $this->getExpectedOptions(['identifier' => 'account_id', 'asset' => 15.9])
+        ];
+        $client = $this->createClient([], $expectedRequest);
         $api = $this->createApi($client);
         $api->deposit('account_id', 15.90);
     }
 
     public function testWithdraw(): void
     {
-        $client = $this->createClient([]);
+        $expectedRequest = [
+            "POST",
+            "http://localhost/api/network/withdraw",
+            $this->getExpectedOptions(['identifier' => 'account_id', 'asset' => 15.9])
+        ];
+        $client = $this->createClient([], $expectedRequest);
         $api = $this->createApi($client);
         $api->withdraw('account_id', 15.90);
     }
     public function testNewTransaction(): void
     {
-        $client = $this->createClient([]);
+        $expectedRequest = [
+            "POST",
+            "http://localhost/api/transaction/new",
+            $this->getExpectedOptions([
+              'asset' => 95.23,
+              'transaction_uuid' => 'uuid_1',
+              'source' => 'src_id',
+              'destination' => 'dst_id',
+              'valid' => true,
+            ])
+        ];
+        $client = $this->createClient([], $expectedRequest);
         $api = $this->createApi($client);
         $transaction = new Transaction();
         $transaction->setIsValid(true)

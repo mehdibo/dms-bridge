@@ -205,7 +205,7 @@ class Api
                 'asset' => $transaction->getAmount(),
                 'transaction_uuid' => $transaction->getUuid(),
                 'source' => $transaction->getSenderId(),
-                'destination' => $transaction->getSenderId(),
+                'destination' => $transaction->getReceiverId(),
                 'valid' => $transaction->isValid(),
             ]
         );
