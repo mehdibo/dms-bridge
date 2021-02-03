@@ -36,21 +36,34 @@ class ApiTest extends TestCase
 
     /**
      * @param array $respBody
+     * @param array $expectedRequest ["METHOD", "URL", ["OPTIONS"]]
      * @param int $respStatusCode
      * @return HttpClientInterface
      */
-    private function createClient(array $respBody, int $respStatusCode = 200): HttpClientInterface
+    private function createClient(array $respBody, array $expectedRequest, int $respStatusCode = 200): HttpClientInterface
     {
-        $responseStub = $this->createStub(ResponseInterface::class);
+        $responseStub = $this->createMock(ResponseInterface::class);
         $responseStub->method('toArray')
             ->willReturn($respBody);
         $responseStub->method('getStatusCode')
             ->willReturn($respStatusCode);
 
-        $clientStub = $this->createStub(HttpClientInterface::class);
-        $clientStub->method('request')
+        $clientStub = $this->createMock(HttpClientInterface::class);
+        $clientStub->expects($this->exactly(1))
+            ->method('request')
+            ->withConsecutive($expectedRequest)
             ->willReturn($responseStub);
         return $clientStub;
+    }
+
+    private function getExpectedOptions(array $payload): array
+    {
+        return [
+            'headers' => [
+                'Authorization' => 'Bearer access_token'
+            ],
+            'json' => $payload
+        ];
     }
 
     /**
@@ -58,10 +71,11 @@ class ApiTest extends TestCase
      */
     public function testCreateAccount(): void
     {
+        $options = $this->getExpectedOptions(["local_identifier" => "account_identifier"]);
         $api = new Api(
             'http://localhost',
             $this->oauthProvider,
-            $this->createClient([])
+            $this->createClient([], ["POST", "http://localhost/api/account/add", $options])
         );
         $api->createAccount('account_identifier');
     }
