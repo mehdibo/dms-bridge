@@ -9,6 +9,7 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mehdibo\DpsBridge\Entities\Account;
 use Mehdibo\DpsBridge\Entities\AccountInterface;
 use Mehdibo\DpsBridge\Entities\Transaction;
+use Mehdibo\DpsBridge\Entities\TransactionInterface;
 use Mehdibo\DpsBridge\Exception\ApiRequestException;
 use Mehdibo\DpsBridge\Exception\AuthenticationException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -94,17 +95,17 @@ class Api
 
     /**
      * @param array $rawTransactions
-     * @return Transaction[]
+     * @return TransactionInterface[]
      */
     private function transactionsFactory(array $rawTransactions): array
     {
         $transactions = [];
         foreach ($rawTransactions as $rawTransaction) {
-            $transactions[] = (new Transaction())->setAsset($rawTransaction['asset'])
+            $transactions[] = (new Transaction())->setAmount($rawTransaction['asset'])
                 ->setUuid($rawTransaction['transaction_uuid'])
-                ->setSrc($rawTransaction['source'])
-                ->setDst($rawTransaction['destination'])
-                ->setValid($rawTransaction['valid']);
+                ->setSenderId($rawTransaction['source'])
+                ->setReceiverId($rawTransaction['destination'])
+                ->setIsValid($rawTransaction['valid']);
         }
         return $transactions;
     }
@@ -146,10 +147,19 @@ class Api
                 throw new ApiRequestException("Couldn't find $expectedKey in response body");
             }
         }
+        $transactions = [];
+        if (!empty($data['transactions'])) {
+            $transactions = $this->transactionsFactory($data['transactions']);
+        }
+        try {
+            $timestamp = new \DateTime($data['timestamp']);
+        } catch (\Exception $e) {
+            throw new ApiRequestException("Invalid timestamp", 0, $e);
+        }
         $account = new Account();
         return $account->setIdentifier($data['local_identifier'])
-            ->setTimestamp(new \DateTime($data['timestamp']))
-            ->setTransactions($this->transactionsFactory($data['transactions']))
+            ->setTimestamp($timestamp)
+            ->setTransactions($transactions)
             ->setBalance($this->getAccountBalance($identifier));
     }
 
@@ -189,7 +199,7 @@ class Api
             'POST',
             '/api/transaction/new',
             [
-                'asset' => $transaction->getAsset(),
+                'asset' => $transaction->getAmount(),
                 'transaction_uuid' => $transaction->getUuid(),
                 'source' => $transaction->getSrc(),
                 'destination' => $transaction->getDst(),
