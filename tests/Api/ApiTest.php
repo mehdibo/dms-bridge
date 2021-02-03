@@ -49,8 +49,7 @@ class ApiTest extends TestCase
             ->willReturn($respStatusCode);
 
         $clientStub = $this->createMock(HttpClientInterface::class);
-        $clientStub->expects($this->exactly(1))
-            ->method('request')
+        $clientStub->method('request')
             ->withConsecutive($expectedRequest)
             ->willReturn($responseStub);
         return $clientStub;
@@ -86,6 +85,11 @@ class ApiTest extends TestCase
 
     public function testGetAccount(): void
     {
+        $expectedRequest = [
+            "GET",
+            "http://localhost/api/account/test_identifier/find",
+            $this->getExpectedOptions([])
+        ];
         $data = [
             'local_identifier' => 'account_id',
             'timestamp' => '2020-12-30T16:11:26.175Z',
@@ -107,7 +111,7 @@ class ApiTest extends TestCase
             ],
             'asset' => 133.7,
         ];
-        $client = $this->createClient($data);
+        $client = $this->createClient($data, $expectedRequest);
         $api = $this->createApi($client);
         $account = $api->getAccount('test_identifier');
         $this->assertInstanceOf(AccountInterface::class, $account);
