@@ -5,8 +5,14 @@ namespace Mehdibo\DpsBridge\Api;
 
 
 use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mehdibo\DpsBridge\Entities\Account;
+use Mehdibo\DpsBridge\Entities\AccountInterface;
 use Mehdibo\DpsBridge\Entities\Transaction;
+use Mehdibo\DpsBridge\Entities\TransactionInterface;
+use Mehdibo\DpsBridge\Exception\ApiRequestException;
+use Mehdibo\DpsBridge\Exception\AuthenticationException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -34,120 +40,172 @@ class Api
         $this->test = $testing;
     }
 
+    /**
+     * @return ResponseInterface
+     * @throws ApiRequestException
+     */
     private function sendRequest(string $method, string $endpoint, array $payload = []): ResponseInterface
     {
+        // OAuth is not activated in the testing environment
         $token = 'dummy_token';
-        if (!$this->test)
-            $token = $this->oauth->getAccessToken('client_credentials')->getToken();
-        return $this->client->request(
-            $method,
-            $this->apiBase.$endpoint,
-            [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$token
-                ],
-                'json' => $payload
-            ]
-        );
+        if (!$this->test) {
+            try {
+                $token = $this->oauth->getAccessToken('client_credentials')->getToken();
+            } catch (IdentityProviderException $e) {
+                $authException = new AuthenticationException($e->getMessage(), 0, $e);
+                throw new ApiRequestException($e->getMessage(), 0, $authException);;
+            }
+        }
+        try {
+            $resp = $this->client->request(
+                $method,
+                $this->apiBase . $endpoint,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token
+                    ],
+                    'json' => $payload
+                ]
+            );
+            $statusCode = $resp->getStatusCode();
+            if ($statusCode !== 200) {
+                throw new ApiRequestException("Request failed ($statusCode): " . $resp->getContent(false));
+            }
+            return $resp;
+        } catch (TransportExceptionInterface $e) {
+            throw new ApiRequestException($e->getMessage(), 0, $e);
+        }
     }
 
     /**
+     * Add new account to DPS
      * @param string $accountId
-     * @return Account
+     * @throws ApiRequestException
      */
-    public function newAccount(string $accountId): ?Account
+    public function createAccount(string $accountId): void
     {
-        $resp = $this->sendRequest(
+        $this->sendRequest(
             'POST',
             '/api/account/add',
             [
                 'local_identifier' => $accountId,
             ]
         );
-        if ($resp->getStatusCode() === 200)
-            return (new Account())->setIdentifier($accountId);
-        return null;
     }
 
     /**
      * @param array $rawTransactions
-     * @return Transaction[]
+     * @return TransactionInterface[]
      */
     private function transactionsFactory(array $rawTransactions): array
     {
         $transactions = [];
         foreach ($rawTransactions as $rawTransaction) {
-            $transactions[] = (new Transaction())->setAsset($rawTransaction['asset'])
+            $transactions[] = (new Transaction())->setAmount($rawTransaction['asset'])
                 ->setUuid($rawTransaction['transaction_uuid'])
-                ->setSrc($rawTransaction['source'])
-                ->setDst($rawTransaction['destination'])
-                ->setValid($rawTransaction['valid']);
+                ->setSenderId($rawTransaction['source'])
+                ->setReceiverId($rawTransaction['destination'])
+                ->setIsValid($rawTransaction['valid']);
         }
         return $transactions;
     }
 
+    /**
+     * @param string $identifier
+     * @return float
+     * @throws ApiRequestException
+     */
     private function getAccountBalance(string $identifier): float
     {
         $response = $this->sendRequest(
             'GET',
             '/api/account/'.$identifier.'/balance'
         );
-        if ($response->getStatusCode() !== 200)
-            return 0.0;
-        return $response->toArray()['asset'];
+        $data = $response->toArray(false);
+        if (!isset($data['asset'])) {
+            throw new ApiRequestException("Couldn't find asset in response body");
+        }
+        return (float) $data['asset'];
     }
 
-    public function getAccount(string $identifier): ?Account
+    /**
+     * @param string $identifier
+     * @return Account|null
+     * @throws ApiRequestException
+     */
+    public function getAccount(string $identifier): ?AccountInterface
     {
-        $response = $this->sendRequest(
+        $resp = $this->sendRequest(
             'GET',
             '/api/account/'.$identifier.'/find'
         );
-        if ($response->getStatusCode() !== 200)
-            return null;
-        $data = $response->toArray();
+        $data = $resp->toArray(false);
+        // Check expected keys
+        $expectedKeys = ['local_identifier', 'transactions', 'timestamp'];
+        foreach ($expectedKeys as $expectedKey) {
+            if (!array_key_exists($expectedKey, $data)) {
+                throw new ApiRequestException("Couldn't find $expectedKey in response body");
+            }
+        }
+        $transactions = [];
+        if (!empty($data['transactions'])) {
+            $transactions = $this->transactionsFactory($data['transactions']);
+        }
+        try {
+            $timestamp = new \DateTime($data['timestamp']);
+        } catch (\Exception $e) {
+            throw new ApiRequestException("Invalid timestamp", 0, $e);
+        }
         $account = new Account();
-        $account->setIdentifier($data['local_identifier'])
-            ->setTimestamp(new \DateTime($data['timestamp']))
-            ->setTransactions($this->transactionsFactory($data['transactions']))
+        return $account->setIdentifier($data['local_identifier'])
+            ->setTimestamp($timestamp)
+            ->setTransactions($transactions)
             ->setBalance($this->getAccountBalance($identifier));
-        return $account;
     }
 
-    public function deposit(string $identifier, float $amount): void
+    /**
+     * @throws ApiRequestException
+     */
+    public function deposit(string $accountId, float $amount): void
     {
         $this->sendRequest(
             'POST',
             '/api/network/deposit',
             [
-                'identifier' => $identifier,
+                'identifier' => $accountId,
                 'asset' => $amount
             ]
         );
     }
 
-    public function withdraw(string $identifier, float $amount): void
+    /**
+     * @throws ApiRequestException
+     */
+    public function withdraw(string $accountId, float $amount): void
     {
         $this->sendRequest(
             'POST',
             '/api/network/withdraw',
             [
-                'identifier' => $identifier,
+                'identifier' => $accountId,
                 'asset' => $amount
             ]
         );
     }
 
-    public function newTransaction(Transaction $transaction): void
+    /**
+     * @throws ApiRequestException
+     */
+    public function newTransaction(TransactionInterface $transaction): void
     {
         $this->sendRequest(
             'POST',
             '/api/transaction/new',
             [
-                'asset' => $transaction->getAsset(),
+                'asset' => $transaction->getAmount(),
                 'transaction_uuid' => $transaction->getUuid(),
-                'source' => $transaction->getSrc(),
-                'destination' => $transaction->getDst(),
+                'source' => $transaction->getSenderId(),
+                'destination' => $transaction->getSenderId(),
                 'valid' => $transaction->isValid(),
             ]
         );

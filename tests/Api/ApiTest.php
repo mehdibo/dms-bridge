@@ -7,7 +7,7 @@ namespace Mehdibo\DpsBridge\Tests\Api;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use Mehdibo\DpsBridge\Api\Api;
-use Mehdibo\DpsBridge\Entities\Account;
+use Mehdibo\DpsBridge\Entities\AccountInterface;
 use Mehdibo\DpsBridge\Entities\Transaction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -56,16 +56,14 @@ class ApiTest extends TestCase
     /**
      * This test doesnt have any assertion as the function doesnt return any value
      */
-    public function testNewAccount(): void
+    public function testCreateAccount(): void
     {
         $api = new Api(
             'http://localhost',
             $this->oauthProvider,
             $this->createClient([])
         );
-        $result = $api->newAccount('account_identifier');
-        $this->assertInstanceOf(Account::class, $result);
-        $this->assertEquals('account_identifier', $result->getIdentifier());
+        $api->createAccount('account_identifier');
     }
 
     public function testGetAccount(): void
@@ -94,18 +92,18 @@ class ApiTest extends TestCase
         $client = $this->createClient($data);
         $api = $this->createApi($client);
         $account = $api->getAccount('test_identifier');
-        $this->assertInstanceOf(Account::class, $account);
-        $this->assertEquals($data['local_identifier'], $account->getIdentifier());
+        $this->assertInstanceOf(AccountInterface::class, $account);
+        $this->assertEquals($data['local_identifier'], $account->getId());
         $this->assertEquals(new \DateTime($data['timestamp']), $account->getTimestamp());
         $this->assertCount(count($data['transactions']), $account->getTransactions());
         $i = 0;
         foreach ($account->getTransactions() as $transaction)
         {
             $this->assertInstanceOf(Transaction::class, $transaction);
-            $this->assertEquals($data['transactions'][$i]['asset'], $transaction->getAsset());
+            $this->assertEquals($data['transactions'][$i]['asset'], $transaction->getAmount());
             $this->assertEquals($data['transactions'][$i]['transaction_uuid'], $transaction->getUuid());
-            $this->assertEquals($data['transactions'][$i]['source'], $transaction->getSrc());
-            $this->assertEquals($data['transactions'][$i]['destination'], $transaction->getDst());
+            $this->assertEquals($data['transactions'][$i]['source'], $transaction->getSenderId());
+            $this->assertEquals($data['transactions'][$i]['destination'], $transaction->getReceiverId());
             $this->assertEquals($data['transactions'][$i]['valid'], $transaction->isValid());
             $i++;
         }
@@ -130,11 +128,11 @@ class ApiTest extends TestCase
         $client = $this->createClient([]);
         $api = $this->createApi($client);
         $transaction = new Transaction();
-        $transaction->setValid(true)
-            ->setDst('dst_id')
-            ->setSrc('src_id')
+        $transaction->setIsValid(true)
+            ->setReceiverId('dst_id')
+            ->setSenderId('src_id')
             ->setUuid('uuid_1')
-            ->setAsset(95.23);
+            ->setAmount(95.23);
         $api->newTransaction($transaction);
     }
 }

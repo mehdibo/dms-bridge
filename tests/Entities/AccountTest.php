@@ -70,14 +70,14 @@ class AccountTest extends TestCase
 
     public function testGetIdentifier()
     {
-        $this->assertEquals(self::DATA['identifier'], $this->account->getIdentifier());
+        $this->assertEquals(self::DATA['identifier'], $this->account->getId());
     }
 
     public function testSetIdentifier()
     {
         $newValue = 'new_identifier';
         $this->account->setIdentifier($newValue);
-        $this->assertEquals($newValue, $this->account->getIdentifier());
+        $this->assertEquals($newValue, $this->account->getId());
     }
 
     public function testGetTransactions()
