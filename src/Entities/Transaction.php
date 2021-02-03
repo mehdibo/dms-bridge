@@ -4,107 +4,67 @@
 namespace Mehdibo\DpsBridge\Entities;
 
 
-class Transaction
+class Transaction implements TransactionInterface
 {
-    private float $asset;
-
+    private float $amount;
     private string $uuid;
+    private string $senderId;
+    private string $receiverId;
+    private bool $isValid;
 
-    private string $src;
 
-    private string $dst;
-
-    private bool $valid;
-
-    /**
-     * @return float
-     */
-    public function getAsset(): float
+    public function getAmount(): float
     {
-        return $this->asset;
+        return $this->amount;
     }
 
-    /**
-     * @param float $asset
-     * @return Transaction
-     */
-    public function setAsset(float $asset): Transaction
+    public function setAmount(float $amount): self
     {
-        $this->asset = $asset;
+        $this->amount = $amount;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getUuid(): string
     {
         return $this->uuid;
     }
 
-    /**
-     * @param string $uuid
-     * @return Transaction
-     */
-    public function setUuid(string $uuid): Transaction
+    public function setUuid(string $uuid): self
     {
         $this->uuid = $uuid;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getSrc(): string
+    public function getSenderId(): string
     {
-        return $this->src;
+        return $this->senderId;
     }
 
-    /**
-     * @param string $src
-     * @return Transaction
-     */
-    public function setSrc(string $src): Transaction
+    public function setSenderId(string $id): self
     {
-        $this->src = $src;
+        $this->senderId = $id;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDst(): string
+    public function getReceiverId(): string
     {
-        return $this->dst;
+        return $this->receiverId;
     }
 
-    /**
-     * @param string $dst
-     * @return Transaction
-     */
-    public function setDst(string $dst): Transaction
+    public function setReceiverId(string $id): self
     {
-        $this->dst = $dst;
+        $this->receiverId = $id;
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isValid(): bool
     {
-        return $this->valid;
+        return $this->isValid;
     }
 
-    /**
-     * @param bool $valid
-     * @return Transaction
-     */
-    public function setValid(bool $valid): Transaction
+    public function setIsValid(bool $valid): self
     {
-        $this->valid = $valid;
+        $this->isValid = $valid;
         return $this;
     }
-
-
 }
