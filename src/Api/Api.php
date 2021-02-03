@@ -113,7 +113,6 @@ class Api
      * @param string $identifier
      * @return float
      * @throws ApiRequestException
-     * @throws BadResponseException
      */
     private function getAccountBalance(string $identifier): float
     {
@@ -123,26 +122,35 @@ class Api
         );
         $data = $response->toArray(false);
         if (!isset($data['asset'])) {
-            throw new BadResponseException("Couldn't find asset in response body");
+            throw new ApiRequestException("Couldn't find asset in response body");
         }
         return (float) $data['asset'];
     }
 
+    /**
+     * @param string $identifier
+     * @return Account|null
+     * @throws ApiRequestException
+     */
     public function getAccount(string $identifier): ?Account
     {
-        $response = $this->sendRequest(
+        $resp = $this->sendRequest(
             'GET',
             '/api/account/'.$identifier.'/find'
         );
-        if ($response->getStatusCode() !== 200)
-            return null;
-        $data = $response->toArray();
+        $data = $resp->toArray(false);
+        // Check expected keys
+        $expectedKeys = ['local_identifier', 'transactions', 'timestamp'];
+        foreach ($expectedKeys as $expectedKey) {
+            if (!array_key_exists($expectedKey, $data)) {
+                throw new ApiRequestException("Couldn't find $expectedKey in response body");
+            }
+        }
         $account = new Account();
-        $account->setIdentifier($data['local_identifier'])
+        return $account->setIdentifier($data['local_identifier'])
             ->setTimestamp(new \DateTime($data['timestamp']))
             ->setTransactions($this->transactionsFactory($data['transactions']))
             ->setBalance($this->getAccountBalance($identifier));
-        return $account;
     }
 
     public function deposit(string $identifier, float $amount): void
