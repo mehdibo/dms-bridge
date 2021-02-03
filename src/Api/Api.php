@@ -193,7 +193,7 @@ class Api
         );
     }
 
-    public function newTransaction(Transaction $transaction): void
+    public function newTransaction(TransactionInterface $transaction): void
     {
         $this->sendRequest(
             'POST',
@@ -201,8 +201,8 @@ class Api
             [
                 'asset' => $transaction->getAmount(),
                 'transaction_uuid' => $transaction->getUuid(),
-                'source' => $transaction->getSrc(),
-                'destination' => $transaction->getDst(),
+                'source' => $transaction->getSenderId(),
+                'destination' => $transaction->getSenderId(),
                 'valid' => $transaction->isValid(),
             ]
         );
