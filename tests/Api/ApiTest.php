@@ -100,10 +100,10 @@ class ApiTest extends TestCase
         foreach ($account->getTransactions() as $transaction)
         {
             $this->assertInstanceOf(Transaction::class, $transaction);
-            $this->assertEquals($data['transactions'][$i]['asset'], $transaction->getAsset());
+            $this->assertEquals($data['transactions'][$i]['asset'], $transaction->getAmount());
             $this->assertEquals($data['transactions'][$i]['transaction_uuid'], $transaction->getUuid());
-            $this->assertEquals($data['transactions'][$i]['source'], $transaction->getSrc());
-            $this->assertEquals($data['transactions'][$i]['destination'], $transaction->getDst());
+            $this->assertEquals($data['transactions'][$i]['source'], $transaction->getSenderId());
+            $this->assertEquals($data['transactions'][$i]['destination'], $transaction->getReceiverId());
             $this->assertEquals($data['transactions'][$i]['valid'], $transaction->isValid());
             $i++;
         }
@@ -128,11 +128,11 @@ class ApiTest extends TestCase
         $client = $this->createClient([]);
         $api = $this->createApi($client);
         $transaction = new Transaction();
-        $transaction->setValid(true)
-            ->setDst('dst_id')
-            ->setSrc('src_id')
+        $transaction->setIsValid(true)
+            ->setReceiverId('dst_id')
+            ->setSenderId('src_id')
             ->setUuid('uuid_1')
-            ->setAsset(95.23);
+            ->setAmount(95.23);
         $api->newTransaction($transaction);
     }
 }

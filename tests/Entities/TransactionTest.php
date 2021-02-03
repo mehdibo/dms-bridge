@@ -20,23 +20,23 @@ class TransactionTest extends TestCase
     public function setUp(): void
     {
         $this->transaction = new Transaction();
-        $this->transaction->setAsset(self::DATA['asset'])
+        $this->transaction->setAmount(self::DATA['asset'])
             ->setUuid(self::DATA['uuid'])
-            ->setSrc(self::DATA['src'])
-            ->setDst(self::DATA['dst'])
-            ->setValid(self::DATA['valid']);
+            ->setSenderId(self::DATA['src'])
+            ->setReceiverId(self::DATA['dst'])
+            ->setIsValid(self::DATA['valid']);
     }
 
     public function testGetAsset(): void
     {
-        $this->assertEquals(self::DATA['asset'], $this->transaction->getAsset());
+        $this->assertEquals(self::DATA['asset'], $this->transaction->getAmount());
     }
 
     public function testSetAsset(): void
     {
         $newValue = 50.02;
-        $this->transaction->setAsset($newValue);
-        $this->assertEquals($newValue, $this->transaction->getAsset());
+        $this->transaction->setAmount($newValue);
+        $this->assertEquals($newValue, $this->transaction->getAmount());
     }
 
     public function testGetUuid(): void
@@ -51,28 +51,28 @@ class TransactionTest extends TestCase
         $this->assertEquals($newValue, $this->transaction->getUuid());
     }
 
-    public function testGetSrc(): void
+    public function testGetSenderId(): void
     {
-        $this->assertEquals(self::DATA['src'], $this->transaction->getSrc());
+        $this->assertEquals(self::DATA['src'], $this->transaction->getSenderId());
     }
 
-    public function testSetSrc(): void
+    public function testSetSenderId(): void
     {
         $newValue = 'new_src';
-        $this->transaction->setSrc($newValue);
-        $this->assertEquals($newValue, $this->transaction->getSrc());
+        $this->transaction->setSenderId($newValue);
+        $this->assertEquals($newValue, $this->transaction->getSenderId());
     }
 
-    public function testGetDst(): void
+    public function testGetReceiverId(): void
     {
-        $this->assertEquals(self::DATA['dst'], $this->transaction->getDst());
+        $this->assertEquals(self::DATA['dst'], $this->transaction->getReceiverId());
     }
 
-    public function testSetDst(): void
+    public function testSetReceiverId(): void
     {
         $newValue = 'new_dst';
-        $this->transaction->setDst($newValue);
-        $this->assertEquals($newValue, $this->transaction->getDst());
+        $this->transaction->setReceiverId($newValue);
+        $this->assertEquals($newValue, $this->transaction->getReceiverId());
     }
 
     public function testIsValid(): void
@@ -80,10 +80,10 @@ class TransactionTest extends TestCase
         $this->assertEquals(self::DATA['valid'], $this->transaction->isValid());
     }
 
-    public function testSetValid(): void
+    public function testSetIsValid(): void
     {
         $newValue = !self::DATA['valid'];
-        $this->transaction->setValid($newValue);
+        $this->transaction->setIsValid($newValue);
         $this->assertEquals($newValue, $this->transaction->isValid());
     }
 }
