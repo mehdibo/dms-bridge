@@ -11,7 +11,6 @@ use Mehdibo\DpsBridge\Entities\AccountInterface;
 use Mehdibo\DpsBridge\Entities\Transaction;
 use Mehdibo\DpsBridge\Exception\ApiRequestException;
 use Mehdibo\DpsBridge\Exception\AuthenticationException;
-use Mehdibo\DpsBridge\Exception\BadResponseException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
