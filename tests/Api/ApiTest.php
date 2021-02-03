@@ -93,7 +93,7 @@ class ApiTest extends TestCase
         $api = $this->createApi($client);
         $account = $api->getAccount('test_identifier');
         $this->assertInstanceOf(Account::class, $account);
-        $this->assertEquals($data['local_identifier'], $account->getIdentifier());
+        $this->assertEquals($data['local_identifier'], $account->getId());
         $this->assertEquals(new \DateTime($data['timestamp']), $account->getTimestamp());
         $this->assertCount(count($data['transactions']), $account->getTransactions());
         $i = 0;

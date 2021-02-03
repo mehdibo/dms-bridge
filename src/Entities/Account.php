@@ -4,7 +4,7 @@
 namespace Mehdibo\DpsBridge\Entities;
 
 
-class Account
+class Account implements AccountInterface
 {
     private string $identifier;
 
@@ -20,7 +20,7 @@ class Account
     /**
      * @return string
      */
-    public function getIdentifier(): string
+    public function getId(): string
     {
         return $this->identifier;
     }
