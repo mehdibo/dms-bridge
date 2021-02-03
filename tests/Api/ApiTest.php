@@ -134,20 +134,41 @@ class ApiTest extends TestCase
 
     public function testDeposit(): void
     {
-        $client = $this->createClient([]);
+        $expectedRequest = [
+            "POST",
+            "http://localhost/api/network/deposit",
+            $this->getExpectedOptions(['identifier' => 'account_id', 'asset' => 15.9])
+        ];
+        $client = $this->createClient([], $expectedRequest);
         $api = $this->createApi($client);
         $api->deposit('account_id', 15.90);
     }
 
     public function testWithdraw(): void
     {
-        $client = $this->createClient([]);
+        $expectedRequest = [
+            "POST",
+            "http://localhost/api/network/withdraw",
+            $this->getExpectedOptions(['identifier' => 'account_id', 'asset' => 15.9])
+        ];
+        $client = $this->createClient([], $expectedRequest);
         $api = $this->createApi($client);
         $api->withdraw('account_id', 15.90);
     }
     public function testNewTransaction(): void
     {
-        $client = $this->createClient([]);
+        $expectedRequest = [
+            "POST",
+            "http://localhost/api/transaction/new",
+            $this->getExpectedOptions([
+              'asset' => 95.23,
+              'transaction_uuid' => 'uuid_1',
+              'source' => 'src_id',
+              'destination' => 'dst_id',
+              'valid' => true,
+            ])
+        ];
+        $client = $this->createClient([], $expectedRequest);
         $api = $this->createApi($client);
         $transaction = new Transaction();
         $transaction->setIsValid(true)
