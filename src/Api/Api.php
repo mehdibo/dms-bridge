@@ -193,6 +193,9 @@ class Api
         );
     }
 
+    /**
+     * @throws ApiRequestException
+     */
     public function newTransaction(TransactionInterface $transaction): void
     {
         $this->sendRequest(
