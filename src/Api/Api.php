@@ -153,25 +153,31 @@ class Api
             ->setBalance($this->getAccountBalance($identifier));
     }
 
-    public function deposit(string $identifier, float $amount): void
+    /**
+     * @throws ApiRequestException
+     */
+    public function deposit(string $accountId, float $amount): void
     {
         $this->sendRequest(
             'POST',
             '/api/network/deposit',
             [
-                'identifier' => $identifier,
+                'identifier' => $accountId,
                 'asset' => $amount
             ]
         );
     }
 
-    public function withdraw(string $identifier, float $amount): void
+    /**
+     * @throws ApiRequestException
+     */
+    public function withdraw(string $accountId, float $amount): void
     {
         $this->sendRequest(
             'POST',
             '/api/network/withdraw',
             [
-                'identifier' => $identifier,
+                'identifier' => $accountId,
                 'asset' => $amount
             ]
         );
