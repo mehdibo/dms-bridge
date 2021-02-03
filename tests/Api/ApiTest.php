@@ -71,11 +71,15 @@ class ApiTest extends TestCase
      */
     public function testCreateAccount(): void
     {
-        $options = $this->getExpectedOptions(["local_identifier" => "account_identifier"]);
+        $expectedRequest = [
+            "POST",
+            "http://localhost/api/account/add",
+            $this->getExpectedOptions(["local_identifier" => "account_identifier"])
+        ];
         $api = new Api(
             'http://localhost',
             $this->oauthProvider,
-            $this->createClient([], ["POST", "http://localhost/api/account/add", $options])
+            $this->createClient([], $expectedRequest)
         );
         $api->createAccount('account_identifier');
     }
