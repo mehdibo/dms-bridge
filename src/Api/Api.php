@@ -67,8 +67,8 @@ class Api
                     'json' => $payload
                 ]
             );
-            $statusCode = $resp->getStatusCode();
-            if ($statusCode !== 200) {
+            $statusCode = (string) $resp->getStatusCode();
+            if ($statusCode[0] !== "2") {
                 throw new ApiRequestException("Request failed ($statusCode): " . $resp->getContent(false));
             }
             return $resp;
