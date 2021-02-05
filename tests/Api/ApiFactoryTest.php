@@ -6,6 +6,7 @@ namespace Mehdibo\DpsBridge\Tests\Api;
 
 use Mehdibo\DpsBridge\Api\Api;
 use Mehdibo\DpsBridge\Api\ApiFactory;
+use Mehdibo\DpsBridge\Api\ApiInterface;
 use PHPUnit\Framework\TestCase;
 
 class ApiFactoryTest extends TestCase
@@ -19,7 +20,7 @@ class ApiFactoryTest extends TestCase
             'client_secret',
             true,
         );
-        $this->assertInstanceOf(Api::class, $api);
+        $this->assertInstanceOf(ApiInterface::class, $api);
     }
 
 }
