@@ -29,14 +29,14 @@ class TransactionTest extends TestCase
 
     public function testGetAsset(): void
     {
-        $this->assertEquals(self::DATA['asset'], $this->transaction->getAmount());
+        $this->assertEquals(self::DATA['asset'], $this->transaction->getAsset());
     }
 
     public function testSetAsset(): void
     {
         $newValue = 50.02;
         $this->transaction->setAmount($newValue);
-        $this->assertEquals($newValue, $this->transaction->getAmount());
+        $this->assertEquals($newValue, $this->transaction->getAsset());
     }
 
     public function testGetUuid(): void

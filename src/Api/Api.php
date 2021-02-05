@@ -202,7 +202,7 @@ class Api implements ApiInterface
             'POST',
             '/api/transaction/new',
             [
-                'asset' => $transaction->getAmount(),
+                'asset' => $transaction->getAsset(),
                 'transaction_uuid' => $transaction->getUuid(),
                 'source' => $transaction->getSenderId(),
                 'destination' => $transaction->getReceiverId(),

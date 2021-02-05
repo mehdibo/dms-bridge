@@ -13,7 +13,7 @@ class Transaction implements TransactionInterface
     private bool $isValid;
 
 
-    public function getAmount(): float
+    public function getAsset(): float
     {
         return $this->amount;
     }

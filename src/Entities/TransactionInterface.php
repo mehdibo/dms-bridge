@@ -6,7 +6,7 @@ namespace Mehdibo\DpsBridge\Entities;
 
 interface TransactionInterface
 {
-    public function getAmount(): float;
+    public function getAsset(): float;
     public function getUuid(): string;
     public function getSenderId(): string;
     public function getReceiverId(): string;

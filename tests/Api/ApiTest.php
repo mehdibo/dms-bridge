@@ -122,7 +122,7 @@ class ApiTest extends TestCase
         foreach ($account->getTransactions() as $transaction)
         {
             $this->assertInstanceOf(Transaction::class, $transaction);
-            $this->assertEquals($data['transactions'][$i]['asset'], $transaction->getAmount());
+            $this->assertEquals($data['transactions'][$i]['asset'], $transaction->getAsset());
             $this->assertEquals($data['transactions'][$i]['transaction_uuid'], $transaction->getUuid());
             $this->assertEquals($data['transactions'][$i]['source'], $transaction->getSenderId());
             $this->assertEquals($data['transactions'][$i]['destination'], $transaction->getReceiverId());
