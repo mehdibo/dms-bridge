@@ -14,7 +14,7 @@ class ApiFactory
         string $clientId,
         string $clientSecret,
         bool $testing = false
-    ): Api
+    ): ApiInterface
     {
         $apiBase = rtrim($apiBase, "/");
         $provider = new GenericProvider([
